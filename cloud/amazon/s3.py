@@ -327,7 +327,7 @@ def download_s3file(module, s3, bucket, obj, dest, retries, version=None):
     for x in range(0, retries + 1):
         try:
             key.get_contents_to_filename(dest)
-            module.exit_json(msg="GET operation complete", changed=True)
+            module.exit_json(msg="GET operation complete", metadata=key.metadata, changed=True)
         except s3.provider.storage_copy_error as e:
             module.fail_json(msg= str(e))
         except SSLError as e:
@@ -342,7 +342,7 @@ def download_s3str(module, s3, bucket, obj, version=None):
         bucket = s3.lookup(bucket)
         key = bucket.get_key(obj, version_id=version)
         contents = key.get_contents_as_string()
-        module.exit_json(msg="GET operation complete", contents=contents, changed=True)
+        module.exit_json(msg="GET operation complete", contents=contents, metadata=key.metadata, changed=True)
     except s3.provider.storage_copy_error as e:
         module.fail_json(msg= str(e))
 
@@ -351,7 +351,7 @@ def get_download_url(module, s3, bucket, obj, expiry, changed=True):
         bucket = s3.lookup(bucket)
         key = bucket.lookup(obj)
         url = key.generate_url(expiry)
-        module.exit_json(msg="Download url:", url=url, expiry=expiry, changed=changed)
+        module.exit_json(msg="Download url:", url=url, expiry=expiry, metadata=key.metadata, changed=changed)
     except s3.provider.storage_response_error as e:
         module.fail_json(msg= str(e))
 
